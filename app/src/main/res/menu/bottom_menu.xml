@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/bottom_inplay"
+        android:icon="@drawable/ic_inplay"
+        android:title="@string/in_play" />
+
+
+    <item
+        android:id="@+id/bottom_coming"
+        android:icon="@drawable/ic_coming"
+        android:title="@string/upcoming" />
+
+
+    <item
+        android:id="@+id/bottom_proft_loss"
+        android:icon="@drawable/ic_profit_loss"
+        android:title="@string/profit_loss" />
+
+    <item
+        android:id="@+id/bottom_user"
+        android:icon="@drawable/ic_user"
+        android:title="(CL1)" />
+</menu>
