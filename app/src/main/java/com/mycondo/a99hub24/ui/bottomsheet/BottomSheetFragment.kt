@@ -11,6 +11,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.mycondo.a99hub24.R
 import com.mycondo.a99hub24.adapters.BottomSheetAdapter
 import com.mycondo.a99hub24.data.network.HomeApi
@@ -42,7 +44,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var bottomSheetAdapter: BottomSheetAdapter
     private lateinit var userPreferences: UserPreferences
     protected val remoteDataSource = RemoteDataSource()
-
+    private var navController: NavController? = null
     protected lateinit var viewModel: BottomViewModel
 
     override fun onCreateView(
@@ -62,6 +64,10 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         super.onActivityCreated(savedInstanceState)
         arrayList = ArrayList()
         userPreferences = UserPreferences(requireContext())
+
+        navController = activity?.let {
+            Navigation.findNavController(it, R.id.fragment2)
+        }
 
         arrayList.add(
             BottomSheetModel(
@@ -134,9 +140,11 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onBottomSheetEvent(bottomSheetEvent: BottomSheetEvent) {
         Toast.makeText(context, bottomSheetEvent.event.toString(), Toast.LENGTH_LONG).show()
+        if (bottomSheetEvent.event == 0) {
+            navController?.navigate(R.id.action_bottomSheetFragment_to_ledgerFragment)
+        }
 
         if (bottomSheetEvent.event == 4) {
-
             logout()
         }
     }

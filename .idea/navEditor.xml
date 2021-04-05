@@ -78,6 +78,18 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="ledgerFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="172" />
+                            <option name="y" value="-223" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="profitLossFragment">
                     <value>
                       <LayoutPositions>
