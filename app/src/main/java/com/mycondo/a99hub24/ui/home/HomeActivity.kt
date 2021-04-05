@@ -2,6 +2,7 @@ package com.mycondo.a99hub24.ui.home
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -12,6 +13,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mycondo.a99hub24.R
 import com.mycondo.a99hub24.data.network.HomeApi
 import com.mycondo.a99hub24.data.network.RemoteDataSource
@@ -25,7 +27,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     private lateinit var binding: ActivityHomeBinding
 
 
@@ -40,14 +42,13 @@ class HomeActivity : AppCompatActivity() {
     protected val remoteDataSource = RemoteDataSource()
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         limitPreferences = LimitPreferences(this)
         val factory = ViewModelFactory(getFragmentRepository())
-        viewModel = ViewModelProvider(this,factory).get(HomeViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
 
         //Setting the navigation controller to Bottom Nav
         binding.bottomNavigation.setupWithNavController(navController)
@@ -83,6 +84,8 @@ class HomeActivity : AppCompatActivity() {
             viewModel.getCoins(it)
         }
 
+        binding.bottomNavigation.setOnNavigationItemSelectedListener(this)
+
     }
 
     fun getFragmentRepository() =
@@ -91,5 +94,21 @@ class HomeActivity : AppCompatActivity() {
     //Setting Up the back button
     override fun onSupportNavigateUp(): Boolean {
         return NavigationUI.navigateUp(navController, null)
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.homeFragment) {
+            navController.navigate(R.id.homeFragment)
+        }
+        if (item.itemId == R.id.comingFragment) {
+            navController.navigate(R.id.comingFragment)
+        }
+        if (item.itemId == R.id.profitLossFragment) {
+            navController.navigate(R.id.profitLossFragment)
+        }
+        if (item.itemId == R.id.bottomSheetFragment) {
+            navController.navigate(R.id.bottomSheetFragment)
+        }
+        return true
     }
 }

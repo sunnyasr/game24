@@ -10,6 +10,7 @@
     <!-- TODO: Update blank fragment layout -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab"
+        style="@style/customTabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?actionBarSize"
@@ -18,7 +19,6 @@
         app:tabIndicatorColor="@null"
         app:tabIndicatorHeight="0dp"
         app:tabMode="fixed"
-        style="@style/customTabLayout"
         app:tabTextColor="@color/white" />
 
     <ss.com.bannerslider.Slider
@@ -28,5 +28,25 @@
         app:slider_hideIndicators="true"
         app:slider_interval="5000"
         app:slider_loopSlides="true" />
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:id="@+id/btn_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+android:gravity="center"
+        android:background="@color/yellow"
+        android:text="@string/cricket"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        android:padding="10dp"
+        app:backgroundTint="@null" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp" />
 
 </LinearLayout>

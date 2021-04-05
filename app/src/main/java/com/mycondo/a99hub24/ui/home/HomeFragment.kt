@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.mycondo.a99hub24.R
 import com.mycondo.a99hub24.adapters.InPlayAdapter
@@ -18,9 +20,7 @@ import com.mycondo.a99hub24.databinding.FragmentHomeBinding
 import com.mycondo.a99hub24.model.InPlayGame
 import com.mycondo.a99hub24.services.PicassoImageLoadingService
 import com.mycondo.a99hub24.ui.base.BaseFragment
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 import org.json.JSONObject
 import ss.com.bannerslider.Slider
@@ -63,13 +63,28 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
         tabLayout.addOnTabSelectedListener(this)
 
 
+//        recyclerView = binding.recyclerView
+        binding.recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                activity,
+                DividerItemDecoration.VERTICAL
+            )
+        )
+        binding.recyclerView.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+            adapter = inPLayAdapter
+        }
+
+
         viewModel.inPlayResponse.observe(viewLifecycleOwner, Observer {
 
             when (it) {
                 is Resource.Success -> {
                     lifecycleScope.launch {
                         kProgressHUD.dismiss()
-                        val data = JSONObject(it.value.string())
+//                        val data = JSONObject(it.value.string())
+                        inplayParse(it.value.string())
                     }
                 }
                 is Resource.Loading -> {

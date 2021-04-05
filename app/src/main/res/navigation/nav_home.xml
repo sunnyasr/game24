@@ -25,4 +25,9 @@
         android:name="com.mycondo.a99hub24.ui.bottomsheet.BottomSheetFragment"
         android:label="fragment_bottom_sheet_list_dialog"
         tools:layout="@layout/fragment_bottom_sheet_list_dialog" />
+    <activity
+        android:id="@+id/homeActivity"
+        android:name="com.mycondo.a99hub24.ui.home.HomeActivity"
+        android:label="activity_home"
+        tools:layout="@layout/activity_home" />
 </navigation>

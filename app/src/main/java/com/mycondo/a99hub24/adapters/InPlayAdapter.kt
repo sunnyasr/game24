@@ -6,6 +6,7 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
@@ -18,9 +19,9 @@ class InPlayAdapter(private val context: Context?, private var arrayList: ArrayL
     RecyclerView.Adapter<InPlayAdapter.InPlayViewHolder>() {
 
     inner class InPlayViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        val team: TextView = itemView.findViewById(R.id.tv_team_name)
+        val team: TextView = itemView.findViewById(R.id.tv_team_name)
 //        val date: TextView = itemView.findViewById(R.id.tv_time)
-//        val cardView: CardView = itemView.findViewById(R.id.carviw_inplay)
+        val cardView: LinearLayout = itemView.findViewById(R.id.carviw_inplay)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InPlayViewHolder {
@@ -34,7 +35,7 @@ class InPlayAdapter(private val context: Context?, private var arrayList: ArrayL
     @SuppressLint("SimpleDateFormat")
     override fun onBindViewHolder(holder: InPlayViewHolder, position: Int) {
         val game = arrayList[position]
-//        holder.team.text = game.long_name
+        holder.team.text = game.long_name
 //
 //
 //        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
