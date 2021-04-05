@@ -8,7 +8,7 @@ import com.mycondo.a99hub24.data.repository.BaseRepository
 import com.mycondo.a99hub24.data.repository.HomeRepository
 import com.mycondo.a99hub24.ui.auth.AuthViewModel
 import com.mycondo.a99hub24.ui.home.HomeViewModel
-
+@Suppress("UNCHECKED_CAST")
 class ViewModelFactory(
     private val repository: BaseRepository
 ) : ViewModelProvider.NewInstanceFactory() {

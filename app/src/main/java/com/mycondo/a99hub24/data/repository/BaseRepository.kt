@@ -27,7 +27,7 @@ abstract class BaseRepository {
         }
     }
 
-    suspend fun logout(api: UserApi) = safeApiCall {
-        api.logout()
+    suspend fun logout(api: UserApi,token:String) = safeApiCall {
+        api.logout(token)
     }
 }

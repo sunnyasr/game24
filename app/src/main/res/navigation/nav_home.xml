@@ -10,4 +10,19 @@
         android:name="com.mycondo.a99hub24.ui.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/comingFragment"
+        android:name="com.mycondo.a99hub24.ui.coming.ComingFragment"
+        android:label="fragment_coming"
+        tools:layout="@layout/fragment_coming" />
+    <fragment
+        android:id="@+id/profitLossFragment"
+        android:name="com.mycondo.a99hub24.ui.profit_loss.ProfitLossFragment"
+        android:label="fragment_profit_loss"
+        tools:layout="@layout/fragment_profit_loss" />
+    <dialog
+        android:id="@+id/bottomSheetFragment"
+        android:name="com.mycondo.a99hub24.ui.bottomsheet.BottomSheetFragment"
+        android:label="fragment_bottom_sheet_list_dialog"
+        tools:layout="@layout/fragment_bottom_sheet_list_dialog" />
 </navigation>

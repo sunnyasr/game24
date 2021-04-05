@@ -4,14 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import com.google.android.material.tabs.TabLayout
 import com.mycondo.a99hub24.R
 import com.mycondo.a99hub24.adapters.MainSliderAdapter
 import com.mycondo.a99hub24.data.network.HomeApi
+import com.mycondo.a99hub24.data.network.Resource
 import com.mycondo.a99hub24.data.repository.HomeRepository
 import com.mycondo.a99hub24.databinding.FragmentHomeBinding
 import com.mycondo.a99hub24.services.PicassoImageLoadingService
 import com.mycondo.a99hub24.ui.base.BaseFragment
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import ss.com.bannerslider.Slider
 
 
@@ -48,6 +52,27 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
 
         tabLayout.addOnTabSelectedListener(this)
 
+
+        viewModel.limitResponse.observe(viewLifecycleOwner, Observer {
+
+            when (it) {
+                is Resource.Success -> {
+                    kProgressHUD.dismiss()
+                    Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                }
+                is Resource.Loading -> {
+                    kProgressHUD.dismiss()
+//                    binding.progressbar.visible(true)
+                    Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+                }
+            }
+        })
+        val token = runBlocking { userPreferences.authToken.first() }
+        token?.let {
+            kProgressHUD.show()
+            viewModel.getCoins(it)
+        }
+
     }
 
     override fun getFragmentBinding(
@@ -59,7 +84,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
         HomeRepository(remoteDataSource.buildApi(HomeApi::class.java), limitPreferences)
 
     override fun onTabSelected(tab: TabLayout.Tab?) {
-        Toast.makeText(context, "selected "+tab?.position.toString(), Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "selected " + tab?.position.toString(), Toast.LENGTH_LONG).show()
     }
 
     override fun onTabUnselected(tab: TabLayout.Tab?) {

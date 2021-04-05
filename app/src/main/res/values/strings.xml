@@ -55,5 +55,7 @@
     <string name="tennis">Tennis</string>
     <string name="football">Football</string>
     <string name="cricket">Cricket</string>
+    <string name="my_commision">My Commision</string>
+    <string name="rules">Rules</string>
 
 </resources>

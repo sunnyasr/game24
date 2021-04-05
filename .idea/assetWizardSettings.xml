@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/D:/sdk/icons/material/materialicons/hourglass_bottom/baseline_hourglass_bottom_24.xml" />
+                                      <entry key="url" value="file:/D:/sdk/icons/material/materialicons/close/baseline_close_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,9 +28,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_set_pin" />
+                            <entry key="outputName" value="ic_close_24" />
                             <entry key="sourceFile" value="C:\Users\Sunny\Desktop\99Hub24\set_pin.svg" />
                           </map>
                         </option>

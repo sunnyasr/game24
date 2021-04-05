@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/black_grey"
+    android:orientation="vertical">
+
+    <!--    <RelativeLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginLeft="10dp"-->
+    <!--        android:layout_marginTop="20dp"-->
+    <!--        android:layout_marginRight="10dp"-->
+    <!--        android:orientation="horizontal">-->
+
+    <!--        <View-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="1dp"-->
+    <!--            android:layout_centerVertical="true"-->
+    <!--            android:layout_gravity="start"-->
+    <!--            android:layout_marginRight="10dp"-->
+    <!--            android:layout_toLeftOf="@id/btn_close"-->
+    <!--            android:background="@color/white" />-->
+
+    <ImageButton
+        android:id="@+id/btn_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="end"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="10dp"
+        android:background="@null"
+        android:src="@drawable/ic_close_24" />
+    <!--    </RelativeLayout>-->
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/list_item_spacing_half"
+        android:paddingBottom="@dimen/list_item_spacing_half"
+        tools:context=".ui.bottomsheet.BottomSheetFragment"
+        tools:listitem="@layout/fragment_bottom_sheet_list_dialog_item" />
+
+</LinearLayout>

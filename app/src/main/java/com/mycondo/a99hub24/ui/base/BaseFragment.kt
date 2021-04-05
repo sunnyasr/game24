@@ -58,7 +58,9 @@ abstract class BaseFragment<VM : BaseViewModel, B : ViewBinding, R : BaseReposit
     fun logout() = lifecycleScope.launch {
         val authToken = userPreferences.authToken.first()
         val api = remoteDataSource.buildApi(UserApi::class.java, authToken)
-        viewModel.logout(api)
+        if (authToken != null) {
+            viewModel.logout(api,authToken)
+        }
         userPreferences.clear()
         requireActivity().startNewActivity(AuthActivity::class.java)
     }
