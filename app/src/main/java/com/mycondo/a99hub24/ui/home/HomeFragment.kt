@@ -5,17 +5,24 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayout
 import com.mycondo.a99hub24.R
+import com.mycondo.a99hub24.adapters.InPlayAdapter
 import com.mycondo.a99hub24.adapters.MainSliderAdapter
+import com.mycondo.a99hub24.common.Common
 import com.mycondo.a99hub24.data.network.HomeApi
 import com.mycondo.a99hub24.data.network.Resource
 import com.mycondo.a99hub24.data.repository.HomeRepository
 import com.mycondo.a99hub24.databinding.FragmentHomeBinding
+import com.mycondo.a99hub24.model.InPlayGame
 import com.mycondo.a99hub24.services.PicassoImageLoadingService
 import com.mycondo.a99hub24.ui.base.BaseFragment
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.json.JSONArray
+import org.json.JSONObject
 import ss.com.bannerslider.Slider
 
 
@@ -25,6 +32,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
 
     private lateinit var slider: Slider
     private lateinit var tabLayout: TabLayout
+    private lateinit var arrayList: ArrayList<InPlayGame>
+    private lateinit var inPLayAdapter: InPlayAdapter
 
     private val imageResId = intArrayOf(
         R.drawable.ic_cricket,
@@ -40,7 +49,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
         Slider.init(PicassoImageLoadingService(requireContext()))
         slider = binding.bannerSlider1
         slider.setAdapter(MainSliderAdapter())
-
+        arrayList = ArrayList()
+        inPLayAdapter = InPlayAdapter(requireContext(), arrayList)
         tabLayout = binding.tab
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.cricket)))
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.football)))
@@ -53,26 +63,71 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
         tabLayout.addOnTabSelectedListener(this)
 
 
-        viewModel.limitResponse.observe(viewLifecycleOwner, Observer {
+        viewModel.inPlayResponse.observe(viewLifecycleOwner, Observer {
 
             when (it) {
                 is Resource.Success -> {
-                    kProgressHUD.dismiss()
-                    Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                    lifecycleScope.launch {
+                        kProgressHUD.dismiss()
+                        val data = JSONObject(it.value.string())
+                    }
                 }
                 is Resource.Loading -> {
-                    kProgressHUD.dismiss()
+                    kProgressHUD.show()
 //                    binding.progressbar.visible(true)
-                    Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+//                    Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+                }
+                is Resource.Failure -> {
+                    logout()
                 }
             }
         })
-        val token = runBlocking { userPreferences.authToken.first() }
-        token?.let {
-            kProgressHUD.show()
-            viewModel.getCoins(it)
-        }
+//        val token = runBlocking { userPreferences.authToken.first() }
+//        token?.let {
+        kProgressHUD.show()
+//
+//        }
 
+        viewModel.getInPlay()
+
+    }
+
+    fun inplayParse(str: String) {
+        val data = JSONObject(str)
+        if (Common(requireContext()).checkJSONObject(data.toString())) {
+
+            val events: JSONObject = data.getJSONObject("events")
+            val x: Iterator<*> = events.keys()
+            val jsonArray = JSONArray()
+            while (x.hasNext()) {
+                val key = x.next() as String
+                jsonArray.put(events[key])
+            }
+
+            for (i in 1..jsonArray.length()) {
+
+                val jsonObject = jsonArray.getJSONObject(i - 1)
+                val ugModel = InPlayGame(
+                    jsonObject.getString("sport_id"),
+                    jsonObject.getString("sport_name"),
+                    jsonObject.getString("event_id"),
+                    jsonObject.getString("market_id"),
+                    jsonObject.getString("long_name"),
+                    jsonObject.getString("short_name"),
+                    jsonObject.getString("start_time"),
+                    jsonObject.getString("inactive")
+                )
+
+                arrayList.add(ugModel)
+            }
+//            inPlayGameViewModel.allDelete(requireActivity())
+//
+//            inPlayGameViewModel.insert(requireActivity(), arrayList)
+            inPLayAdapter.setData(arrayList)
+
+        } else {
+            Toast.makeText(context, "Failed", Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun getFragmentBinding(

@@ -19,6 +19,10 @@ class HomeRepository(
         api.getLimitCoins(token)
     }
 
+    suspend fun getInPlay() = safeApiCall {
+        api.getInPlay()
+    }
+
 
     suspend fun saveCoins(token: LimitResponse) {
         preferences.store(token)

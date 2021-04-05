@@ -62,6 +62,7 @@ abstract class BaseFragment<VM : BaseViewModel, B : ViewBinding, R : BaseReposit
             viewModel.logout(api,authToken)
         }
         userPreferences.clear()
+        limitPreferences.clear()
         requireActivity().startNewActivity(AuthActivity::class.java)
     }
 

@@ -2,10 +2,7 @@ package com.mycondo.a99hub24.data.preferences
 
 import android.content.Context
 import androidx.datastore.DataStore
-import androidx.datastore.preferences.Preferences
-import androidx.datastore.preferences.createDataStore
-import androidx.datastore.preferences.edit
-import androidx.datastore.preferences.preferencesKey
+import androidx.datastore.preferences.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.mycondo.a99hub24.data.responses.LimitResponse
@@ -44,5 +41,11 @@ class LimitPreferences(context: Context) {
             .map { preferences ->
                 preferences[LIMIT_KEY] ?: "0"
             }
+
+    suspend fun clear() {
+        dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
 
 }

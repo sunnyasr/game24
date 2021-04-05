@@ -9,10 +9,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.mycondo.a99hub24.R
 import com.mycondo.a99hub24.adapters.BottomSheetAdapter
+import com.mycondo.a99hub24.data.network.HomeApi
+import com.mycondo.a99hub24.data.network.RemoteDataSource
+import com.mycondo.a99hub24.data.network.UserApi
+import com.mycondo.a99hub24.data.preferences.LimitPreferences
+import com.mycondo.a99hub24.data.preferences.UserPreferences
+import com.mycondo.a99hub24.data.repository.BottomSheetRepository
+import com.mycondo.a99hub24.data.repository.HomeRepository
 import com.mycondo.a99hub24.databinding.FragmentBottomSheetListDialogBinding
 import com.mycondo.a99hub24.event_bus.BottomSheetEvent
+import com.mycondo.a99hub24.ui.auth.AuthActivity
+import com.mycondo.a99hub24.ui.base.ViewModelFactory
+import com.mycondo.a99hub24.ui.utils.startNewActivity
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -26,19 +40,28 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
     private lateinit var arrayList: ArrayList<BottomSheetModel>
     private lateinit var bottomSheetAdapter: BottomSheetAdapter
+    private lateinit var userPreferences: UserPreferences
+    protected val remoteDataSource = RemoteDataSource()
+
+    protected lateinit var viewModel: BottomViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentBottomSheetListDialogBinding.inflate(layoutInflater, container, false)
-//        return inflater.inflate(R.layout.fragment_bottom_sheet_list_dialog, container, false)
+        val factory = ViewModelFactory(getFragmentRepository())
+        viewModel = ViewModelProvider(this, factory).get(BottomViewModel::class.java)
         return binding.root
     }
+
+    fun getFragmentRepository() =
+        BottomSheetRepository(remoteDataSource.buildApi(UserApi::class.java))
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         arrayList = ArrayList()
+        userPreferences = UserPreferences(requireContext())
 
         arrayList.add(
             BottomSheetModel(
@@ -86,6 +109,17 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
     }
 
+    fun logout() = lifecycleScope.launch {
+        val authToken = userPreferences.authToken.first()
+        val api = remoteDataSource.buildApi(UserApi::class.java, authToken)
+        if (authToken != null) {
+            viewModel.logout(api, authToken)
+        }
+        userPreferences.clear()
+        LimitPreferences(requireContext()).clear()
+        requireActivity().startNewActivity(AuthActivity::class.java)
+    }
+
 
     override fun onStart() {
         super.onStart()
@@ -103,7 +137,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
         if (bottomSheetEvent.event == 4) {
 
-            Toast.makeText(context, "bottomSheetEvent.event.name", Toast.LENGTH_LONG).show()
+            logout()
         }
     }
 
