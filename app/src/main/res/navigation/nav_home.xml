@@ -28,6 +28,9 @@
         <action
             android:id="@+id/action_bottomSheetFragment_to_ledgerFragment"
             app:destination="@id/ledgerFragment" />
+        <action
+            android:id="@+id/action_bottomSheetFragment_to_rulesFragment"
+            app:destination="@id/rulesFragment" />
     </dialog>
     <activity
         android:id="@+id/homeActivity"
@@ -39,4 +42,9 @@
         android:name="com.mycondo.a99hub24.ui.my_ledger.LedgerFragment"
         android:label="fragment_ledger"
         tools:layout="@layout/fragment_ledger" />
+    <fragment
+        android:id="@+id/rulesFragment"
+        android:name="com.mycondo.a99hub24.ui.rules.RulesFragment"
+        android:label="fragment_rules"
+        tools:layout="@layout/fragment_rules" />
 </navigation>

@@ -75,7 +75,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
             layoutManager = LinearLayoutManager(context)
             adapter = inPLayAdapter
         }
-
+        context?.let {
+            viewModel.getInPlayGame(it)
+                ?.observe(requireActivity(), Observer {
+                    if (it.size > 0) {
+                        kProgressHUD.dismiss()
+                        inPLayAdapter.setData(it as ArrayList<InPlayGame>)
+                    }
+                })
+        }
 
         viewModel.inPlayResponse.observe(viewLifecycleOwner, Observer {
 
@@ -97,11 +105,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
                 }
             }
         })
-//        val token = runBlocking { userPreferences.authToken.first() }
-//        token?.let {
+
         kProgressHUD.show()
-//
-//        }
 
         viewModel.getInPlay()
 
@@ -135,9 +140,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
 
                 arrayList.add(ugModel)
             }
-//            inPlayGameViewModel.allDelete(requireActivity())
-//
-//            inPlayGameViewModel.insert(requireActivity(), arrayList)
+            viewModel.allDelete(requireActivity())
+
+            viewModel.insert(requireActivity(), arrayList)
             inPLayAdapter.setData(arrayList)
 
         } else {

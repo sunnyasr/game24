@@ -2,6 +2,7 @@ package com.mycondo.a99hub24.ui.home
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.lifecycle.Observer
@@ -36,6 +37,7 @@ class HomeActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     private lateinit var limitPreferences: LimitPreferences
+    private lateinit var userPreferences: UserPreferences
 
     private lateinit var viewModel: HomeViewModel
 
@@ -47,6 +49,7 @@ class HomeActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
         limitPreferences = LimitPreferences(this)
+        userPreferences = UserPreferences(this)
         val factory = ViewModelFactory(getFragmentRepository())
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
 
@@ -56,7 +59,12 @@ class HomeActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
 
         limitPreferences.coin.asLiveData().observe(this, {
-//            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            binding.tvCoins.text = it.toDouble().toInt().toString()
+            binding.tvExpcoins.text = StringBuilder().append("Exp : ").append(it.toDouble().toInt())
+        })
+        userPreferences.username.asLiveData().observe(this, {
+            binding.bottomNavigation.menu.getItem(3).title =
+                StringBuilder().append("(").append(it).append(")")
         })
 
 

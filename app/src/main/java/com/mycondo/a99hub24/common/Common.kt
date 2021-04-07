@@ -80,7 +80,7 @@ class Common(context: Context) {
     fun checkJSONObject(str: String): Boolean {
 
         var result: Boolean = false
-        val json: Object = JSONTokener(str).nextValue() as Object;
+        val json = JSONTokener(str).nextValue()
         if (json is JSONObject)
             result = true
         else if (json is JSONArray)

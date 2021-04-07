@@ -17,7 +17,8 @@
     <color name="blue">#007bff</color>
     <color name="blue_100">#8c8cfd</color>
     <color name="red">#FF471A</color>
-    <color name="green">#8BC34A</color>
+<!--    <color name="green">#8BC34A</color>-->
+    <color name="green">#28a745</color>
     <color name="grey">#888399</color>
     <color name="grey_light">#e6e6e6</color>
     <color name="grey_dark">#3b394a</color>
