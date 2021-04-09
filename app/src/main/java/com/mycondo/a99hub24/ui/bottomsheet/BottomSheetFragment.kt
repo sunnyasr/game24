@@ -2,43 +2,33 @@ package com.mycondo.a99hub24.ui.bottomsheet
 
 import android.os.Bundle
 import android.view.*
-import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.mycondo.a99hub24.R
 import com.mycondo.a99hub24.adapters.BottomSheetAdapter
-import com.mycondo.a99hub24.data.network.RemoteDataSource
-import com.mycondo.a99hub24.data.network.UserApi
-import com.mycondo.a99hub24.data.preferences.LimitPreferences
 import com.mycondo.a99hub24.data.preferences.UserPreferences
-import com.mycondo.a99hub24.data.repository.BottomSheetRepository
 import com.mycondo.a99hub24.databinding.FragmentBottomSheetListDialogBinding
 import com.mycondo.a99hub24.event_bus.BottomSheetEvent
-import com.mycondo.a99hub24.ui.auth.AuthActivity
-import com.mycondo.a99hub24.ui.base.ViewModelFactory
 import com.mycondo.a99hub24.ui.change_password.ChangePasswordFragment
-import com.mycondo.a99hub24.ui.utils.startNewActivity
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import com.mycondo.a99hub24.ui.utils.logout
+import dagger.hilt.android.AndroidEntryPoint
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class BottomSheetFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentBottomSheetListDialogBinding? = null
     private val binding get() = _binding!!
     private lateinit var arrayList: ArrayList<BottomSheetModel>
     private lateinit var bottomSheetAdapter: BottomSheetAdapter
-    private lateinit var userPreferences: UserPreferences
-    protected val remoteDataSource = RemoteDataSource()
+    @Inject lateinit var userPreferences: UserPreferences
     private var navController: NavController? = null
-    protected lateinit var viewModel: BottomViewModel
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,8 +36,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     ): View {
 //        setStyle(DialogFragment.STYLE_NO_FRAME, 0);
         _binding = FragmentBottomSheetListDialogBinding.inflate(layoutInflater, container, false)
-        val factory = ViewModelFactory(getFragmentRepository())
-        viewModel = ViewModelProvider(this, factory).get(BottomViewModel::class.java)
+
 //        dialog!!.window!!.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.TOP)
 //        val p = dialog!!.window!!.attributes
 //        p.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -57,13 +46,12 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    fun getFragmentRepository() =
-        BottomSheetRepository(remoteDataSource.buildApi(UserApi::class.java))
+
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         arrayList = ArrayList()
-        userPreferences = UserPreferences(requireContext())
+
 
         navController = activity?.let {
             Navigation.findNavController(it, R.id.fragment2)
@@ -105,7 +93,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         bottomSheetAdapter = BottomSheetAdapter(context, arrayList)
-//        recyclerView = binding.list
 
         binding.list.apply {
             setHasFixedSize(true)
@@ -115,16 +102,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
     }
 
-    fun logout() = lifecycleScope.launch {
-        val authToken = userPreferences.authToken.first()
-        val api = remoteDataSource.buildApi(UserApi::class.java, authToken)
-        if (authToken != null) {
-            viewModel.logout(api, authToken)
-        }
-        userPreferences.clear()
-        LimitPreferences(requireContext()).clear()
-        requireActivity().startNewActivity(AuthActivity::class.java)
-    }
 
 
     override fun onStart() {
@@ -139,7 +116,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onBottomSheetEvent(bottomSheetEvent: BottomSheetEvent) {
-//        Toast.makeText(context, bottomSheetEvent.event.toString(), Toast.LENGTH_LONG).show()
         if (bottomSheetEvent.event == 0) {
             navController?.navigate(R.id.action_bottomSheetFragment_to_ledgerFragment)
         }

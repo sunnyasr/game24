@@ -3,29 +3,22 @@ package com.mycondo.a99hub24.ui.my_ledger
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.example.a99hub.model.EventModel
 import com.example.a99hub.model.MatchMarketsModel
 import com.example.a99hub.model.SessionMarketsModel
 import com.mycondo.a99hub24.R
 import com.mycondo.a99hub24.common.Common
-import com.mycondo.a99hub24.data.network.LedgerApi
 import com.mycondo.a99hub24.data.network.Resource
-import com.mycondo.a99hub24.data.repository.LedgerRepository
 import com.mycondo.a99hub24.databinding.FragmentLedgerBinding
 import com.mycondo.a99hub24.model.Ledger
-import com.mycondo.a99hub24.ui.base.BaseFragment
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -34,30 +27,33 @@ import org.json.JSONObject
 import java.util.stream.Collectors
 import java.text.SimpleDateFormat
 import android.text.format.DateFormat
+import androidx.fragment.app.viewModels
+import com.mycondo.a99hub24.data.preferences.UserPreferences
+import com.mycondo.a99hub24.ui.utils.logout
+import com.mycondo.a99hub24.ui.utils.progress
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, LedgerRepository>() {
+@AndroidEntryPoint
+class LedgerFragment : Fragment(R.layout.fragment_ledger) {
 
 
+    private lateinit var binding: FragmentLedgerBinding
+    private val viewModel by viewModels<LedgerViewModel>()
     private lateinit var eventList: ArrayList<EventModel>
     private lateinit var matchMarketList: ArrayList<MatchMarketsModel>
     private lateinit var sessionMarketList: ArrayList<SessionMarketsModel>
     private lateinit var arrayList: ArrayList<Ledger>
     private lateinit var tempList: ArrayList<Ledger>
     private lateinit var tl: TableLayout
+    @Inject
+    lateinit var userPreferences: UserPreferences
+    @Inject
+    lateinit var common: Common
 
-    override fun getViewModel() = LedgerViewModel::class.java
-
-    override fun getFragmentBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ) = FragmentLedgerBinding.inflate(inflater, container, false)
-
-    override fun getFragmentRepository() =
-        LedgerRepository(remoteDataSource.buildApi(LedgerApi::class.java))
-
-    @SuppressLint("NewApi")
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentLedgerBinding.bind(view)
 
         arrayList = ArrayList()
         tempList = ArrayList()
@@ -69,24 +65,26 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
 
             when (it) {
                 is Resource.Success -> {
-                    kProgressHUD.dismiss()
+                    progress(false)
                     ledger(it.value.string())
                 }
                 is Resource.Loading -> {
-                    kProgressHUD.show()
+                    progress(true)
                 }
                 is Resource.Failure -> {
-                    kProgressHUD.dismiss()
+                    progress(false)
                     Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                 }
             }
         })
 
-        val token = runBlocking { userPreferences.authToken.first() }
-        token?.let {
-//            kProgressHUD.show()
-            viewModel.getCoins(it)
+
+        val tk = runBlocking { userPreferences.authToken.first() }
+        tk?.let {
+            viewModel.getLedger(tk)
         }
+
+
     }
 
 
@@ -98,13 +96,14 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
         sessionMarketList.clear()
         val data = JSONObject(str)
         context?.let {
-            if (Common(it).checkTokenExpiry(data.toString())) {
+            if (common.checkTokenExpiry(data.toString())) {
                 lifecycleScope.launch {
                     logout()
+//                    Toast.makeText(context, "Logout" + data.toString(), Toast.LENGTH_LONG).show()
                 }
             } else {
                 /*EVENTS*/
-                if (Common(requireActivity()).checkJSONObject(data.getString("events"))) {
+                if (common.checkJSONObject(data.getString("events"))) {
                     val events: JSONObject = data.getJSONObject("events")
                     val x: Iterator<*> = events.keys()
                     val jsonEventArray = JSONArray()
@@ -132,7 +131,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
                 }
 
                 /*SESSION MARKET*/
-                if (Common(requireContext()).checkJSONObject(data.getString("session_markets"))) {
+                if (common.checkJSONObject(data.getString("session_markets"))) {
                     val session_markets: JSONObject =
                         data.getJSONObject("session_markets")
                     val _x_session: Iterator<*> = session_markets.keys()
@@ -154,7 +153,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
                 }
 
                 /*MATCH MARKET*/
-                if (Common(requireContext()).checkJSONObject(data.getString("match_markets"))) {
+                if (common.checkJSONObject(data.getString("match_markets"))) {
                     val match_markets: JSONObject = data.getJSONObject("match_markets")
                     val _x_match: Iterator<*> = match_markets.keys()
                     val jsonMatchArray = JSONArray()
@@ -335,9 +334,9 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
             val tr = TableRow(it)
             val headBg = "#ffbd15"
             val headTxt = Color.BLACK
-            tr.layoutParams = Common(requireActivity()).getLayoutParams()
+            tr.layoutParams =common.getLayoutParams()
             tr.addView(
-                Common(requireContext()).getTextView(
+                common.getTextView(
                     0,
                     "DATE",
                     headTxt,
@@ -347,7 +346,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
                 )
             )
             tr.addView(
-                Common(requireContext()).getTextView(
+                common.getTextView(
                     0,
                     "CREDIT",
                     headTxt,
@@ -357,7 +356,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
                 )
             )
             tr.addView(
-                Common(requireContext()).getTextView(
+               common.getTextView(
                     0,
                     "DEBIT",
                     headTxt,
@@ -368,7 +367,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
             )
 
             tr.addView(
-                Common(requireContext()).getTextView(
+               common.getTextView(
                     0,
                     "BALANCE",
                     headTxt,
@@ -378,7 +377,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
                 )
             )
             tr.addView(
-                Common(requireContext()).getTextView(
+               common.getTextView(
                     0,
                     "WINNER/Remark",
                     headTxt,
@@ -387,7 +386,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
                     0, 12f, 0, Gravity.CENTER, -1
                 )
             )
-            tl.addView(tr, Common(requireContext()).getTblLayoutParams())
+            tl.addView(tr,common.getTblLayoutParams())
         }
 
     }
@@ -426,7 +425,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
 
                 tr.orientation = TableRow.VERTICAL
                 tr.addView(
-                    Common(requireContext()).getTextView(
+                   common.getTextView(
                         i,
                         dtime.toString(),
                         Color.DKGRAY,
@@ -439,7 +438,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
                     )
                 )
                 tr.addView(
-                    Common(requireContext()).getTextView(
+                   common.getTextView(
                         i,
                         arrayList.get(i - 1).won,
                         if (arrayList.get(i - 1).won.toInt() > 0) Color.parseColor("#2E7D32") else Color.BLACK,
@@ -452,7 +451,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
                     )
                 )
                 tr.addView(
-                    Common(requireContext()).getTextView(
+                   common.getTextView(
                         i,
                         if (arrayList.get(i - 1).lost.toInt() > 0) StringBuilder().append("-")
                             .append(arrayList.get(i - 1).lost)
@@ -479,7 +478,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
 
 
                 tr.addView(
-                    Common(requireContext()).getTextView(
+                   common.getTextView(
                         i,
                         blc.toString(),
                         colorBalance,
@@ -492,7 +491,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
                     )
                 )
                 tr.addView(
-                    Common(requireContext()).getTextView(
+                   common.getTextView(
                         i,
                         arrayList.get(i - 1).long_name,
                         Color.BLACK,
@@ -504,7 +503,7 @@ class LedgerFragment : BaseFragment<LedgerViewModel, FragmentLedgerBinding, Ledg
                         Gravity.LEFT, -1
                     )
                 )
-                tl.addView(tr, Common(requireContext()).getTblLayoutParams())
+                tl.addView(tr,common.getTblLayoutParams())
             }
 
         }

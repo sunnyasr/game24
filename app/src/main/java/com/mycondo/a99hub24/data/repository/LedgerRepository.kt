@@ -1,13 +1,13 @@
 package com.mycondo.a99hub24.data.repository
 
 import com.mycondo.a99hub24.data.network.LedgerApi
-import com.mycondo.a99hub24.data.preferences.LimitPreferences
+import javax.inject.Inject
 
-class LedgerRepository(
+class LedgerRepository  @Inject constructor(
     private val api: LedgerApi
-) : BaseRepository() {
+) : BaseRepository(api) {
 
-    suspend fun getCoins(
+    suspend fun getLedger(
         token: String
     ) = safeApiCall {
         api.getLedger(token)

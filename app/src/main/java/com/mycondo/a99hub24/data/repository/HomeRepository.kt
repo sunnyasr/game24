@@ -3,22 +3,19 @@ package com.mycondo.a99hub24.data.repository
 import android.content.Context
 import androidx.lifecycle.LiveData
 import com.mycondo.a99hub24.data.database.Hub24Database
-import com.mycondo.a99hub24.data.network.AuthApi
 import com.mycondo.a99hub24.data.network.HomeApi
-import com.mycondo.a99hub24.data.network.Resource
 import com.mycondo.a99hub24.data.preferences.LimitPreferences
-import com.mycondo.a99hub24.data.preferences.UserPreferences
 import com.mycondo.a99hub24.data.responses.LimitResponse
-import com.mycondo.a99hub24.data.responses.LoginResponse
 import com.mycondo.a99hub24.model.InPlayGame
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeRepository(
+class HomeRepository @Inject constructor(
     private val api: HomeApi,
     private val preferences: LimitPreferences
-) : BaseRepository() {
+) : BaseRepository(api) {
 
     suspend fun getCoins(
         token: String

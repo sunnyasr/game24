@@ -2,8 +2,11 @@ package com.mycondo.a99hub24.ui.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -13,21 +16,24 @@ import com.mycondo.a99hub24.R
 import com.mycondo.a99hub24.adapters.InPlayAdapter
 import com.mycondo.a99hub24.adapters.MainSliderAdapter
 import com.mycondo.a99hub24.common.Common
-import com.mycondo.a99hub24.data.network.HomeApi
 import com.mycondo.a99hub24.data.network.Resource
-import com.mycondo.a99hub24.data.repository.HomeRepository
 import com.mycondo.a99hub24.databinding.FragmentHomeBinding
 import com.mycondo.a99hub24.model.InPlayGame
 import com.mycondo.a99hub24.services.PicassoImageLoadingService
-import com.mycondo.a99hub24.ui.base.BaseFragment
+import com.mycondo.a99hub24.ui.utils.logout
+import com.mycondo.a99hub24.ui.utils.progress
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import ss.com.bannerslider.Slider
 
-
-class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeRepository>(),
+@AndroidEntryPoint
+class HomeFragment : Fragment(R.layout.fragment_home),
     TabLayout.OnTabSelectedListener {
+
+    private lateinit var binding: FragmentHomeBinding
+    private val viewModel by viewModels<HomeViewModel>()
 
 
     private lateinit var slider: Slider
@@ -42,10 +48,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
         R.drawable.ic_teenpatti
     )
 
-    override fun getViewModel() = HomeViewModel::class.java
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentHomeBinding.bind(view)
+
         Slider.init(PicassoImageLoadingService(requireContext()))
         slider = binding.bannerSlider1
         slider.setAdapter(MainSliderAdapter())
@@ -59,11 +66,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
         for (i in 0 until tabLayout.getTabCount()) {
             tabLayout.getTabAt(i)?.setIcon(imageResId[i])
         }
-
         tabLayout.addOnTabSelectedListener(this)
 
-
-//        recyclerView = binding.recyclerView
         binding.recyclerView.addItemDecoration(
             DividerItemDecoration(
                 activity,
@@ -79,7 +83,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
             viewModel.getInPlayGame(it)
                 ?.observe(requireActivity(), Observer {
                     if (it.size > 0) {
-                        kProgressHUD.dismiss()
+                        progress(false)
                         inPLayAdapter.setData(it as ArrayList<InPlayGame>)
                     }
                 })
@@ -90,15 +94,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
             when (it) {
                 is Resource.Success -> {
                     lifecycleScope.launch {
-                        kProgressHUD.dismiss()
-//                        val data = JSONObject(it.value.string())
+                        progress(false)
                         inplayParse(it.value.string())
                     }
                 }
                 is Resource.Loading -> {
-                    kProgressHUD.show()
-//                    binding.progressbar.visible(true)
-//                    Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+                    progress(true)
                 }
                 is Resource.Failure -> {
                     logout()
@@ -106,7 +107,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
             }
         })
 
-        kProgressHUD.show()
+        progress(true)
 
         viewModel.getInPlay()
 
@@ -150,13 +151,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding, HomeReposi
         }
     }
 
-    override fun getFragmentBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ) = FragmentHomeBinding.inflate(inflater, container, false)
-
-    override fun getFragmentRepository() =
-        HomeRepository(remoteDataSource.buildApi(HomeApi::class.java), limitPreferences)
 
     override fun onTabSelected(tab: TabLayout.Tab?) {
         Toast.makeText(context, "selected " + tab?.position.toString(), Toast.LENGTH_LONG).show()

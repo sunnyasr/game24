@@ -5,8 +5,7 @@ import com.mycondo.a99hub24.data.responses.LoginResponse
 import okhttp3.ResponseBody
 import retrofit2.http.*
 
-interface HomeApi {
-
+interface HomeApi : BaseApi {
 
     @GET("limit")
     suspend fun getLimitCoins(@Query("token") token: String): List<LimitResponse>

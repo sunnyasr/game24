@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
@@ -15,19 +18,23 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.kaopiz.kprogresshud.KProgressHUD
 import com.mycondo.a99hub24.R
-import com.mycondo.a99hub24.data.network.HomeApi
-import com.mycondo.a99hub24.data.network.RemoteDataSource
 import com.mycondo.a99hub24.data.network.Resource
 import com.mycondo.a99hub24.data.preferences.LimitPreferences
 import com.mycondo.a99hub24.data.preferences.UserPreferences
-import com.mycondo.a99hub24.data.repository.HomeRepository
+
 import com.mycondo.a99hub24.databinding.ActivityHomeBinding
-import com.mycondo.a99hub24.ui.base.ViewModelFactory
+import com.mycondo.a99hub24.ui.auth.AuthActivity
+import com.mycondo.a99hub24.ui.my_ledger.LedgerViewModel
+import com.mycondo.a99hub24.ui.utils.startNewActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class HomeActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
     private lateinit var binding: ActivityHomeBinding
 
@@ -36,27 +43,24 @@ class HomeActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         (supportFragmentManager.findFragmentById(R.id.fragment2) as NavHostFragment).navController
     }
 
-    private lateinit var limitPreferences: LimitPreferences
-    private lateinit var userPreferences: UserPreferences
+    @Inject
+    lateinit var limitPreferences: LimitPreferences
+    @Inject
+    lateinit var userPreferences: UserPreferences
 
-    private lateinit var viewModel: HomeViewModel
+    private val viewModel by viewModels<HomeViewModel>()
 
-    protected val remoteDataSource = RemoteDataSource()
+    private lateinit var kProgressHUD: KProgressHUD
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        limitPreferences = LimitPreferences(this)
-        userPreferences = UserPreferences(this)
-        val factory = ViewModelFactory(getFragmentRepository())
-        viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
+        setProgress()
 
         //Setting the navigation controller to Bottom Nav
         binding.bottomNavigation.setupWithNavController(navController)
-
-
 
         limitPreferences.coin.asLiveData().observe(this, {
             binding.tvCoins.text = it.toDouble().toInt().toString()
@@ -77,9 +81,8 @@ class HomeActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                     }
                 }
                 is Resource.Loading -> {
-//                    kProgressHUD.show()
-//                    binding.progressbar.visible(true)
-//                    Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+                    kProgressHUD.show()
+
                 }
                 is Resource.Failure -> {
 //                    logout()
@@ -88,7 +91,6 @@ class HomeActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         })
         val token = runBlocking { UserPreferences(this@HomeActivity).authToken.first() }
         token?.let {
-//            kProgressHUD.show()
             viewModel.getCoins(it)
         }
 
@@ -96,12 +98,32 @@ class HomeActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     }
 
-    fun getFragmentRepository() =
-        HomeRepository(remoteDataSource.buildApi(HomeApi::class.java), limitPreferences)
-
     //Setting Up the back button
     override fun onSupportNavigateUp(): Boolean {
         return NavigationUI.navigateUp(navController, null)
+    }
+
+    fun performLogout() = lifecycleScope.launch {
+
+        viewModel.logout(userPreferences.authToken.first()!!)
+        userPreferences.clear()
+        limitPreferences.clear()
+        startNewActivity(AuthActivity::class.java)
+    }
+
+    fun token() = runBlocking { userPreferences.authToken.first() }
+
+    fun setProgress() {
+        kProgressHUD = KProgressHUD(this)
+            .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+            .setLabel("Please wait")
+            .setCancellable(true)
+            .setAnimationSpeed(2)
+            .setDimAmount(0.5f)
+    }
+
+    fun progress(yes: Boolean) {
+        if (yes) kProgressHUD.show() else kProgressHUD.dismiss()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

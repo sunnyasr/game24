@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.nex3z:flow-layout:1.3.3@aar">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/af27db92008cd3144decbae9c425b497/jetified-flow-layout-1.3.3/AndroidManifest.xml" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/af27db92008cd3144decbae9c425b497/jetified-flow-layout-1.3.3/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/af27db92008cd3144decbae9c425b497/jetified-flow-layout-1.3.3/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5089d528d1fe9957413ae44b3d1f5ed3/jetified-flow-layout-1.3.3/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5089d528d1fe9957413ae44b3d1f5ed3/jetified-flow-layout-1.3.3/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5089d528d1fe9957413ae44b3d1f5ed3/jetified-flow-layout-1.3.3/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.nex3z/flow-layout/1.3.3/69a77794cb35970118b7d69035b805a40af1d3c6/flow-layout-1.3.3-javadoc.jar!/" />

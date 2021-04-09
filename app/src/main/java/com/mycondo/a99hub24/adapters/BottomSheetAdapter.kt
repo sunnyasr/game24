@@ -44,7 +44,7 @@ class BottomSheetAdapter(
         holder.name.text = data.name
 
         holder.cardView.setOnClickListener {
-//            Toast.makeText(context,position.toString(),Toast.LENGTH_LONG).show()
+
             EventBus.getDefault().postSticky(BottomSheetEvent(position))
         }
     }

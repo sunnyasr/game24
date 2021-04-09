@@ -7,8 +7,9 @@ import com.mycondo.a99hub24.data.network.Resource
 import com.mycondo.a99hub24.data.responses.LoginResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class UserPreferences(
+class UserPreferences @Inject constructor(
     context: Context
 ) {
     private val applicationContext = context.applicationContext
@@ -24,8 +25,8 @@ class UserPreferences(
 
     val username: Flow<String?>
         get() = dataStore.data.map { preferences ->
-                preferences[KEY_USERNAME] ?: ""
-            }
+            preferences[KEY_USERNAME] ?: ""
+        }
 
     suspend fun saveAuthToken(authToken: LoginResponse) {
         dataStore.edit { preferences ->

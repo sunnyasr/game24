@@ -12,8 +12,9 @@ import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.IOException
 import java.nio.charset.Charset
+import javax.inject.Inject
 
-class Common(context: Context) {
+class Common @Inject constructor(context: Context) {
     private var context: Context
 
     val sessionError: String =
@@ -91,7 +92,7 @@ class Common(context: Context) {
 
 
     fun checkTokenExpiry(str: String): Boolean {
-        var result: Boolean = false
+        var result = false
         if (str.length == 40) {
             result = true
         }

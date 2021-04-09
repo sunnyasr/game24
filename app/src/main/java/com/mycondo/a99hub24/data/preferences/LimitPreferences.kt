@@ -6,8 +6,9 @@ import androidx.datastore.preferences.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import com.mycondo.a99hub24.data.responses.LimitResponse
+import javax.inject.Inject
 
-class LimitPreferences(context: Context) {
+class LimitPreferences  @Inject constructor(context: Context) {
 
     private val applicationContext = context.applicationContext
     private val dataStore: DataStore<Preferences> = applicationContext.createDataStore(
