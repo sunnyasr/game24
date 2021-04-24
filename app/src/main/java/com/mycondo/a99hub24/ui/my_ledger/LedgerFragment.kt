@@ -15,7 +15,6 @@ import com.example.a99hub.model.EventModel
 import com.example.a99hub.model.MatchMarketsModel
 import com.example.a99hub.model.SessionMarketsModel
 import com.mycondo.a99hub24.R
-import com.mycondo.a99hub24.common.Common
 import com.mycondo.a99hub24.data.network.Resource
 import com.mycondo.a99hub24.databinding.FragmentLedgerBinding
 import com.mycondo.a99hub24.model.Ledger
@@ -28,9 +27,9 @@ import java.util.stream.Collectors
 import java.text.SimpleDateFormat
 import android.text.format.DateFormat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.mycondo.a99hub24.data.preferences.UserPreferences
-import com.mycondo.a99hub24.ui.utils.logout
-import com.mycondo.a99hub24.ui.utils.progress
+import com.mycondo.a99hub24.ui.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -48,8 +47,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
     private lateinit var tl: TableLayout
     @Inject
     lateinit var userPreferences: UserPreferences
-    @Inject
-    lateinit var common: Common
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -78,7 +76,25 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
             }
         })
 
+        context?.let {
+            viewModel.getLedger(it)
+                ?.observe(requireActivity(), Observer {
+                    if (it.size > 0) {
+                        arrayList = it as ArrayList<Ledger>
+                        progress(false)
+                        tl.removeAllViews()
 
+                        if (arrayList.size > 0) {
+                            addHeaders()
+                            addData()
+//                            tvEmpty.visibility = View.GONE
+                        } else {
+//                            tvEmpty.visibility = View.VISIBLE
+                        }
+                    }
+//                    else tvEmpty.visibility = VISIBLE
+                })
+        }
         val tk = runBlocking { userPreferences.authToken.first() }
         tk?.let {
             viewModel.getLedger(tk)
@@ -96,14 +112,14 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
         sessionMarketList.clear()
         val data = JSONObject(str)
         context?.let {
-            if (common.checkTokenExpiry(data.toString())) {
+            if (checkTokenExpiry(data.toString())) {
                 lifecycleScope.launch {
                     logout()
 //                    Toast.makeText(context, "Logout" + data.toString(), Toast.LENGTH_LONG).show()
                 }
             } else {
                 /*EVENTS*/
-                if (common.checkJSONObject(data.getString("events"))) {
+                if (checkJSONObject(data.getString("events"))) {
                     val events: JSONObject = data.getJSONObject("events")
                     val x: Iterator<*> = events.keys()
                     val jsonEventArray = JSONArray()
@@ -131,7 +147,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                 }
 
                 /*SESSION MARKET*/
-                if (common.checkJSONObject(data.getString("session_markets"))) {
+                if (checkJSONObject(data.getString("session_markets"))) {
                     val session_markets: JSONObject =
                         data.getJSONObject("session_markets")
                     val _x_session: Iterator<*> = session_markets.keys()
@@ -153,7 +169,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                 }
 
                 /*MATCH MARKET*/
-                if (common.checkJSONObject(data.getString("match_markets"))) {
+                if (checkJSONObject(data.getString("match_markets"))) {
                     val match_markets: JSONObject = data.getJSONObject("match_markets")
                     val _x_match: Iterator<*> = match_markets.keys()
                     val jsonMatchArray = JSONArray()
@@ -304,18 +320,10 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                     it.start_time
                 }
 
-//                ledgerViewModel.allDelete(requireContext())
-//
-//                ledgerViewModel.insert(requireActivity(), arrayList)
-                tl.removeAllViews()
+                viewModel.allDelete(requireContext())
 
-                if (arrayList.size > 0) {
-                    addHeaders()
-                    addData()
-//                                binding.tvEmpty.visibility = GONE
-                } else {
-//                                binding.tvEmpty.visibility = VISIBLE
-                }
+                viewModel.insert(requireActivity(), arrayList)
+
 
             }
 
@@ -324,7 +332,6 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
 
     override fun onDestroy() {
         super.onDestroy()
-//        _binding = null
         tl.removeAllViews()
     }
 
@@ -334,9 +341,9 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
             val tr = TableRow(it)
             val headBg = "#ffbd15"
             val headTxt = Color.BLACK
-            tr.layoutParams =common.getLayoutParams()
+            tr.layoutParams =getLayoutParams()
             tr.addView(
-                common.getTextView(
+              getTextView(
                     0,
                     "DATE",
                     headTxt,
@@ -346,7 +353,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                 )
             )
             tr.addView(
-                common.getTextView(
+                getTextView(
                     0,
                     "CREDIT",
                     headTxt,
@@ -356,7 +363,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                 )
             )
             tr.addView(
-               common.getTextView(
+               getTextView(
                     0,
                     "DEBIT",
                     headTxt,
@@ -367,7 +374,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
             )
 
             tr.addView(
-               common.getTextView(
+               getTextView(
                     0,
                     "BALANCE",
                     headTxt,
@@ -377,7 +384,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                 )
             )
             tr.addView(
-               common.getTextView(
+               getTextView(
                     0,
                     "WINNER/Remark",
                     headTxt,
@@ -386,7 +393,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                     0, 12f, 0, Gravity.CENTER, -1
                 )
             )
-            tl.addView(tr,common.getTblLayoutParams())
+            tl.addView(tr,getTblLayoutParams())
         }
 
     }
@@ -425,7 +432,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
 
                 tr.orientation = TableRow.VERTICAL
                 tr.addView(
-                   common.getTextView(
+                   getTextView(
                         i,
                         dtime.toString(),
                         Color.DKGRAY,
@@ -438,7 +445,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                     )
                 )
                 tr.addView(
-                   common.getTextView(
+                   getTextView(
                         i,
                         arrayList.get(i - 1).won,
                         if (arrayList.get(i - 1).won.toInt() > 0) Color.parseColor("#2E7D32") else Color.BLACK,
@@ -451,7 +458,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                     )
                 )
                 tr.addView(
-                   common.getTextView(
+                   getTextView(
                         i,
                         if (arrayList.get(i - 1).lost.toInt() > 0) StringBuilder().append("-")
                             .append(arrayList.get(i - 1).lost)
@@ -478,7 +485,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
 
 
                 tr.addView(
-                   common.getTextView(
+                   getTextView(
                         i,
                         blc.toString(),
                         colorBalance,
@@ -491,7 +498,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                     )
                 )
                 tr.addView(
-                   common.getTextView(
+                   getTextView(
                         i,
                         arrayList.get(i - 1).long_name,
                         Color.BLACK,
@@ -503,7 +510,7 @@ class LedgerFragment : Fragment(R.layout.fragment_ledger) {
                         Gravity.LEFT, -1
                     )
                 )
-                tl.addView(tr,common.getTblLayoutParams())
+                tl.addView(tr,getTblLayoutParams())
             }
 
         }

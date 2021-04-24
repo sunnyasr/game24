@@ -26,7 +26,8 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
     private lateinit var arrayList: ArrayList<BottomSheetModel>
     private lateinit var bottomSheetAdapter: BottomSheetAdapter
-    @Inject lateinit var userPreferences: UserPreferences
+    @Inject
+    lateinit var userPreferences: UserPreferences
     private var navController: NavController? = null
 
 
@@ -34,19 +35,9 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        setStyle(DialogFragment.STYLE_NO_FRAME, 0);
         _binding = FragmentBottomSheetListDialogBinding.inflate(layoutInflater, container, false)
-
-//        dialog!!.window!!.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.TOP)
-//        val p = dialog!!.window!!.attributes
-//        p.width = ViewGroup.LayoutParams.MATCH_PARENT
-//        p.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE
-//        p.x = 200
-//        dialog!!.window!!.setAttributes(p)
         return binding.root
     }
-
-
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -103,7 +94,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     }
 
 
-
     override fun onStart() {
         super.onStart()
         EventBus.getDefault().register(this)
@@ -118,6 +108,9 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     fun onBottomSheetEvent(bottomSheetEvent: BottomSheetEvent) {
         if (bottomSheetEvent.event == 0) {
             navController?.navigate(R.id.action_bottomSheetFragment_to_ledgerFragment)
+        }
+        if (bottomSheetEvent.event == 1) {
+            navController?.navigate(R.id.action_bottomSheetFragment_to_commisionFragment)
         }
         if (bottomSheetEvent.event == 2) {
             navController?.navigate(R.id.action_bottomSheetFragment_to_rulesFragment)

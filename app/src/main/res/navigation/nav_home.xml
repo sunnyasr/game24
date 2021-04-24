@@ -31,6 +31,9 @@
         <action
             android:id="@+id/action_bottomSheetFragment_to_rulesFragment"
             app:destination="@id/rulesFragment" />
+        <action
+            android:id="@+id/action_bottomSheetFragment_to_commisionFragment"
+            app:destination="@id/commisionFragment" />
     </dialog>
     <activity
         android:id="@+id/homeActivity"
@@ -47,4 +50,9 @@
         android:name="com.mycondo.a99hub24.ui.rules.RulesFragment"
         android:label="fragment_rules"
         tools:layout="@layout/fragment_rules" />
+    <fragment
+        android:id="@+id/commisionFragment"
+        android:name="com.mycondo.a99hub24.ui.commision.CommisionFragment"
+        android:label="fragment_commision"
+        tools:layout="@layout/fragment_commision" />
 </navigation>

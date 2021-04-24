@@ -15,11 +15,12 @@ import com.google.android.material.tabs.TabLayout
 import com.mycondo.a99hub24.R
 import com.mycondo.a99hub24.adapters.InPlayAdapter
 import com.mycondo.a99hub24.adapters.MainSliderAdapter
-import com.mycondo.a99hub24.common.Common
+
 import com.mycondo.a99hub24.data.network.Resource
 import com.mycondo.a99hub24.databinding.FragmentHomeBinding
 import com.mycondo.a99hub24.model.InPlayGame
 import com.mycondo.a99hub24.services.PicassoImageLoadingService
+import com.mycondo.a99hub24.ui.utils.checkJSONObject
 import com.mycondo.a99hub24.ui.utils.logout
 import com.mycondo.a99hub24.ui.utils.progress
 import dagger.hilt.android.AndroidEntryPoint
@@ -115,7 +116,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),
 
     fun inplayParse(str: String) {
         val data = JSONObject(str)
-        if (Common(requireContext()).checkJSONObject(data.toString())) {
+        if (checkJSONObject(data.toString())) {
 
             val events: JSONObject = data.getJSONObject("events")
             val x: Iterator<*> = events.keys()

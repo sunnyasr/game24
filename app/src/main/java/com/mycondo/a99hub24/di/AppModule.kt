@@ -1,11 +1,11 @@
 package com.mycondo.a99hub24.di
 
 import android.content.Context
-import com.mycondo.a99hub24.common.Common
 import com.mycondo.a99hub24.data.network.*
 import com.mycondo.a99hub24.data.preferences.LimitPreferences
 import com.mycondo.a99hub24.data.preferences.UserPreferences
 import com.mycondo.a99hub24.data.repository.AuthRepository
+import com.mycondo.a99hub24.data.repository.ChangePassRepository
 import com.mycondo.a99hub24.data.repository.HomeRepository
 import com.mycondo.a99hub24.data.repository.LedgerRepository
 import dagger.Module
@@ -25,6 +25,7 @@ object AppModule {
         return RemoteDataSource()
     }
 
+    /*---------------START-LOGIN----------------*/
     @Singleton
     @Provides
     fun provideAuthApi(
@@ -34,6 +35,35 @@ object AppModule {
         return remoteDataSource.buildApi(AuthApi::class.java, context)
     }
 
+    @Provides
+    fun provideAuthRepository(
+        authApi: AuthApi,
+        userPreferences: UserPreferences
+    ): AuthRepository {
+        return AuthRepository(authApi, userPreferences)
+    }
+    /*--------------END-LOGIN----------------*/
+
+
+    /*--------------START-CHANGE-PASS----------------*/
+    @Singleton
+    @Provides
+    fun provideChangePassApi(
+        remoteDataSource: RemoteDataSource,
+        @ApplicationContext context: Context
+    ): ChangePassApi {
+        return remoteDataSource.buildApi(ChangePassApi::class.java, context)
+    }
+
+    @Provides
+    fun provideChangePassRepository(
+        ledgerApi: ChangePassApi
+    ): ChangePassRepository {
+        return ChangePassRepository(ledgerApi)
+    }
+    /*--------------END-CHANGE-PASS----------------*/
+
+    /*-------------START-HOME-INPLAY----------------*/
     @Singleton
     @Provides
     fun provideUserApi(
@@ -43,6 +73,17 @@ object AppModule {
         return remoteDataSource.buildApi(HomeApi::class.java, context)
     }
 
+    @Provides
+    fun provideUserRepository(
+        homeApi: HomeApi,
+        limitPreferences: LimitPreferences
+    ): HomeRepository {
+        return HomeRepository(homeApi, limitPreferences)
+    }
+    /*-------------END-HOME-INPLAY----------------*/
+
+
+    /*-------------START-LEDGER----------------*/
     @Singleton
     @Provides
     fun provideLedgerApi(
@@ -52,6 +93,14 @@ object AppModule {
         return remoteDataSource.buildApi(LedgerApi::class.java, context)
     }
 
+    @Provides
+    fun provideLedgerRepository(
+        ledgerApi: LedgerApi
+    ): LedgerRepository {
+        return LedgerRepository(ledgerApi)
+    }
+    /*-------------END-LEDGER----------------*/
+
     @Singleton
     @Provides
     fun provideUserPreferences(@ApplicationContext context: Context): UserPreferences {
@@ -60,36 +109,10 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideLimtiPreferences(@ApplicationContext context: Context): LimitPreferences {
+    fun provideLimitPreferences(@ApplicationContext context: Context): LimitPreferences {
         return LimitPreferences(context)
     }
-    @Singleton
-    @Provides
-    fun provideCommon(@ApplicationContext context: Context): Common {
-        return Common(context)
-    }
 
 
-    @Provides
-    fun provideAuthRepository(
-        authApi: AuthApi,
-        userPreferences: UserPreferences
-    ): AuthRepository {
-        return AuthRepository(authApi, userPreferences)
-    }
 
-    @Provides
-    fun provideUserRepository(
-        homeApi: HomeApi,
-        limitPreferences: LimitPreferences
-    ): HomeRepository {
-        return HomeRepository(homeApi, limitPreferences)
-    }
-
-    @Provides
-    fun provideLedgerRepository(
-        ledgerApi: LedgerApi
-    ): LedgerRepository {
-        return LedgerRepository(ledgerApi)
-    }
 }

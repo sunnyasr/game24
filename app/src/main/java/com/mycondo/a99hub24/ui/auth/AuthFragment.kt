@@ -14,6 +14,7 @@ import com.mycondo.a99hub24.databinding.FragmentAuthBinding
 import com.mycondo.a99hub24.ui.home.HomeActivity
 import com.mycondo.a99hub24.ui.utils.handleApiError
 import com.mycondo.a99hub24.ui.utils.startNewActivity
+import com.mycondo.a99hub24.ui.utils.toast
 import com.sdsmdg.tastytoast.TastyToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -79,7 +80,13 @@ class AuthFragment : Fragment(R.layout.fragment_auth) {
     private fun login() {
         val username = binding.etUsername.text.toString().trim()
         val password = binding.etPassword.text.toString().trim()
-        viewModel.login(username, password, "")
+        if (username.isEmpty()) {
+            toast("Enter username",TastyToast.INFO)
+        } else if (password.isEmpty()) {
+            toast("Enter upassword",TastyToast.INFO)
+        } else {
+            viewModel.login(username, password, "")
+        }
     }
 
 }

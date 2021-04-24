@@ -46,6 +46,11 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_bottomSheetFragment_to_rulesFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                           </map>
                         </option>
                       </LayoutPositions>
@@ -58,6 +63,18 @@
                           <Point>
                             <option name="x" value="-77" />
                             <option name="y" value="94" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="commisionFragment">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="639" />
+                            <option name="y" value="53" />
                           </Point>
                         </option>
                       </LayoutPositions>

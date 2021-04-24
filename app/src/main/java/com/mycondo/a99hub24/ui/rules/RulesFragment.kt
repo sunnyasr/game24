@@ -13,25 +13,15 @@ import com.mycondo.a99hub24.R
 import com.mycondo.a99hub24.databinding.FragmentRulesBinding
 
 
-class RulesFragment : Fragment() {
+class RulesFragment : Fragment(R.layout.fragment_rules) {
 
     protected lateinit var binding: FragmentRulesBinding
     private lateinit var mWebView: WebView
 
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        // Inflate the layout for this fragment
-        binding = FragmentRulesBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding = FragmentRulesBinding.bind(view)
         mWebView = binding.webview
         mWebView.loadUrl("file:///android_asset/rules.html");
         mWebView.settings.javaScriptEnabled = true
