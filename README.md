@@ -1,2 +1,2 @@
-# vrx-mobile
+#init-project
 
